@@ -26,10 +26,17 @@ test('should inser an account with success', () => {
         });
 });
 
-test('should return all accounts', () => {
-    return request(app).get(MAIN_ROUTE)
-        .then((response) => {
-            expect(response.status).toBe(200);
-            expect(response.body.length).toBeGreaterThan(0);
+test('should return all accounts', async () => {
+    return app.db('accounts')
+        .insert({
+            name: 'Acc List',
+            user_id: user.id,
+        })
+        .then(() => {
+            request(app).get(MAIN_ROUTE)
+            .then((response) => {
+                expect(response.status).toBe(200);
+                expect(response.body.length).toBeGreaterThan(0);
+            });
         });
 });
