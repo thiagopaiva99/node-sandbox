@@ -16,6 +16,12 @@ module.exports = (app) => {
             };
         }
 
+        if (!user.password) {
+            return {
+                error: 'Senha é um atributo obrigatório',
+            };
+        }
+
         return app.db('users').insert(user, '*');
     };
 
