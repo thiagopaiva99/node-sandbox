@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "lint": "eslint src/** tests/** --fix",
     "test": "jest",
-    "secure:mode": "jest --watch --verbose=true"
+    "secure:mode": "jest --watch --verbose=true",
+    "knex:create:migrate": "knex migrate:make",
+    "migrate": "knex migrate:latest"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
