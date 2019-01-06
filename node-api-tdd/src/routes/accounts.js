@@ -1,11 +1,11 @@
 module.exports = (app) => {
     const findAll = (req, res) => {
-        app.services.users.findAll()
+        app.services.accounts.findAll()
             .then(users => res.status(200).json(users));
     };
 
-    const createUser = async (req, res) => {
-        const result = await app.services.users.save(req.body);
+    const createAccount = async (req, res) => {
+        const result = await app.services.accounts.save(req.body);
 
         if (result.error) {
             return res.status(400).json(result);
@@ -16,6 +16,6 @@ module.exports = (app) => {
 
     return {
         findAll,
-        createUser,
+        createAccount,
     };
 };
