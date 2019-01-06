@@ -1,6 +1,6 @@
 module.exports = (app) => {
-    const findAll = () => {
-        return app.db('users').select();
+    const findAll = (filter = {}) => {
+        return app.db('users').where(filter).select();
     };
 
     const save = async (user) => {
@@ -19,6 +19,14 @@ module.exports = (app) => {
         if (!user.password) {
             return {
                 error: 'Senha é um atributo obrigatório',
+            };
+        }
+
+        const userDB = await findAll({ email: user.email });
+
+        if (userDB && userDB.length > 0) {
+            return {
+                error: 'Já existe um usuário com esse email',
             };
         }
 
