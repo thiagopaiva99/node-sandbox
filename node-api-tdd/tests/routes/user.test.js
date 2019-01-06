@@ -23,3 +23,17 @@ test('should insert a user with success', () => {
             expect(response.body).toHaveProperty('name', 'Thiago');
         });
 });
+
+test('should not insert a user without a name', () => {
+    const email = `user_${Date.now()}@mail.com`;
+
+    request(app).post('/users')
+        .send({
+            email,
+            password: '123456',
+        })
+        .then((response) => {
+            expect(response.status).toBe(400);
+            expect(response.body.error).toBe('Nome é um atributo obrigatório');
+        });
+});

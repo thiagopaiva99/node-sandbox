@@ -7,6 +7,10 @@ module.exports = (app) => {
     const createUser = async (req, res) => {
         const result = await app.services.users.save(req.body);
 
+        if (result.error) {
+            res.status(400).json(result);
+        }
+
         res.status(201).json(result[0]);
     };
 
