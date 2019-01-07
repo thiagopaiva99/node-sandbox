@@ -14,7 +14,15 @@ module.exports = (app) => {
     };
 
     const createAccount = async (req, res) => {
-        const result = await app.services.accounts.save(req.body);
+        const { body } = req;
+
+        if (!body.name) {
+            return res.status(400).json({
+                error: 'Nome é um atributo obrigatório',
+            });
+        }
+
+        const result = await app.services.accounts.save(body);
 
         if (result.error) {
             return res.status(400).json(result);
@@ -35,9 +43,7 @@ module.exports = (app) => {
         const { id } = req.params;
 
         app.services.accounts.delete(id)
-            .then(() => res.status(200).json({
-                message: 'Conta deletada',
-            }));
+            .then(() => res.status(204).send());
     };
 
     return {

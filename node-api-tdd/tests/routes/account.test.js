@@ -63,7 +63,17 @@ test('should delete an account', () => {
         .insert({ name: 'Acc to Delete', user_id: user.id }, '*')
         .then(account => request(app).delete(`${MAIN_ROUTE}/${account[0].id}`))
         .then((response) => {
-            expect(response.status).toBe(200);
-            expect(response.body.message).toBe('Conta deletada');
+            expect(response.status).toBe(204);
+        });
+});
+
+test('should not create account if name is empty', () => {
+    return request(app).post(MAIN_ROUTE)
+        .send({
+            user_id: user.id,
+        })
+        .then((response) => {
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('error', 'Nome é um atributo obrigatório');
         });
 });
