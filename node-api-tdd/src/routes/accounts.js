@@ -5,7 +5,7 @@ module.exports = (app) => {
     };
 
     const find = (req, res) => {
-        const { id } = req.body;
+        const { id } = req.params;
 
         app.services.accounts.find({ id })
             .then((account) => {
@@ -23,9 +23,18 @@ module.exports = (app) => {
         return res.status(201).json(result[0]);
     };
 
+    const update = (req, res) => {
+        const { id } = req.params;
+        const { body } = req;
+
+        app.services.accounts.update(id, body)
+            .then(account => res.status(200).json(account[0]));
+    };
+
     return {
         findAll,
         find,
         createAccount,
+        update,
     };
 };

@@ -11,9 +11,16 @@ module.exports = (app) => {
         return app.db('accounts').insert(account, '*');
     };
 
+    const update = async (id, data) => {
+        return app.db('accounts')
+            .where({ id })
+            .update(data, '*');
+    };
+
     return {
         findAll,
         find,
         save,
+        update,
     };
 };

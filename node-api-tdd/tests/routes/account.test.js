@@ -14,7 +14,7 @@ beforeAll(async () => {
     user = { ...response[0] };
 });
 
-test('should inser an account with success', () => {
+test('should insert an account with success', () => {
     return request(app).post(MAIN_ROUTE)
         .send({
             name: '#acc 1',
@@ -26,33 +26,34 @@ test('should inser an account with success', () => {
         });
 });
 
-test('should return all accounts', async () => {
+test('should return all accounts', () => {
     return app.db('accounts')
-        .insert({
-            name: 'Acc List',
-            user_id: user.id,
-        })
-        .then(() => {
-            request(app).get(MAIN_ROUTE)
-            .then((response) => {
-                expect(response.status).toBe(200);
-                expect(response.body.length).toBeGreaterThan(0);
-            });
+        .insert({ name: 'Acc list', user_id: user.id })
+        .then(() => request(app).get(MAIN_ROUTE))
+        .then((response) => {
+            expect(response.status).toBe(200);
+            expect(response.body.length).toBeGreaterThan(0);
         });
 });
 
 test('should return an account by id', () => {
     return app.db('accounts')
-        .insert({
-            name: 'Acc List By Id',
-            user_id: user.id,
-        }, '*')
-        .then((account) => {
-            request(app).get(`${MAIN_ROUTE}/${account[0].id}`)
-            .then((response) => {
-                expect(response.status).toBe(200);
-                expect(response.body).toHaveProperty('name', 'Acc List By Id');
-                expect(response.body.user_id).toBe(user.id);
-            });
+        .insert({ name: 'Acc list', user_id: user.id }, ['id'])
+        .then(account => request(app).get(`${MAIN_ROUTE}/${account[0].id}`))
+        .then((response) => {
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveProperty('name', 'Acc list');
+            expect(response.body).toHaveProperty('user_id', user.id);
+        });
+});
+
+test('should update an account', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc to Update', user_id: user.id }, '*')
+        .then(account => request(app).put(`${MAIN_ROUTE}/${account[0].id}`)
+                            .send({ name: 'Acc Updated' }))
+        .then((accountUpdated) => {
+            expect(accountUpdated.status).toBe(200);
+            expect(accountUpdated.body).toHaveProperty('name', 'Acc Updated');
         });
 });

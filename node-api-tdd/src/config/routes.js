@@ -8,5 +8,6 @@ module.exports = (app) => {
         .post(app.routes.accounts.createAccount);
 
     app.route('/accounts/:id')
-        .get(app.routes.accounts.find);
+        .get(app.routes.accounts.find)
+        .put(app.routes.accounts.update);
 };
