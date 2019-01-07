@@ -31,10 +31,20 @@ module.exports = (app) => {
             .then(account => res.status(200).json(account[0]));
     };
 
+    const remove = (req, res) => {
+        const { id } = req.params;
+
+        app.services.accounts.delete(id)
+            .then(() => res.status(200).json({
+                message: 'Conta deletada',
+            }));
+    };
+
     return {
         findAll,
         find,
         createAccount,
         update,
+        delete: remove,
     };
 };

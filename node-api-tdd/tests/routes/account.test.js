@@ -57,3 +57,13 @@ test('should update an account', () => {
             expect(accountUpdated.body).toHaveProperty('name', 'Acc Updated');
         });
 });
+
+test('should delete an account', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc to Delete', user_id: user.id }, '*')
+        .then(account => request(app).delete(`${MAIN_ROUTE}/${account[0].id}`))
+        .then((response) => {
+            expect(response.status).toBe(200);
+            expect(response.body.message).toBe('Conta deletada');
+        });
+});
