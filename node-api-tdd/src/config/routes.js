@@ -6,4 +6,7 @@ module.exports = (app) => {
     app.route('/accounts')
         .get(app.routes.accounts.findAll)
         .post(app.routes.accounts.createAccount);
+
+    app.route('/accounts/:id')
+        .get(app.routes.accounts.find);
 };

@@ -40,3 +40,19 @@ test('should return all accounts', async () => {
             });
         });
 });
+
+test('should return an account by id', () => {
+    return app.db('accounts')
+        .insert({
+            name: 'Acc List By Id',
+            user_id: user.id,
+        }, '*')
+        .then((account) => {
+            request(app).get(`${MAIN_ROUTE}/${account[0].id}`)
+            .then((response) => {
+                expect(response.status).toBe(200);
+                expect(response.body).toHaveProperty('name', 'Acc List By Id');
+                expect(response.body.user_id).toBe(user.id);
+            });
+        });
+});

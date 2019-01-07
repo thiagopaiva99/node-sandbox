@@ -4,6 +4,15 @@ module.exports = (app) => {
             .then(users => res.status(200).json(users));
     };
 
+    const find = (req, res) => {
+        const { id } = req.body;
+
+        app.services.accounts.find({ id })
+            .then((account) => {
+                return res.status(200).json(account);
+            });
+    };
+
     const createAccount = async (req, res) => {
         const result = await app.services.accounts.save(req.body);
 
@@ -16,6 +25,7 @@ module.exports = (app) => {
 
     return {
         findAll,
+        find,
         createAccount,
     };
 };
