@@ -32,7 +32,7 @@ test('should not insert a user without a name', () => {
         })
         .then((response) => {
             expect(response.status).toBe(400);
-            expect(response.body.error).toBe('Nome é um atributo obrigatório');
+            expect(response.body.error.message).toBe('Nome é um atributo obrigatório');
         });
 });
 
@@ -44,7 +44,7 @@ test('should not insert a user without an email', async () => {
         });
 
     expect(result.status).toBe(400);
-    expect(result.body.error).toBe('Email é um atributo obrigatório');
+    expect(result.body.error.message).toBe('Email é um atributo obrigatório');
 });
 
 test('should not insert a user without a password', (done) => {
@@ -55,7 +55,7 @@ test('should not insert a user without a password', (done) => {
         })
         .then((response) => {
             expect(response.status).toBe(400);
-            expect(response.body.error).toBe('Senha é um atributo obrigatório');
+            expect(response.body.error.message).toBe('Senha é um atributo obrigatório');
 
             done();
         });
@@ -70,6 +70,6 @@ test('should not insert a user with an email that already exists', () => {
     })
     .then((response) => {
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe('Já existe um usuário com esse email');
+        expect(response.body.error.message).toBe('Já existe um usuário com esse email');
     });
 });
