@@ -16,19 +16,9 @@ module.exports = (app) => {
     const createAccount = async (req, res) => {
         const { body } = req;
 
-        if (!body.name) {
-            return res.status(400).json({
-                error: 'Nome é um atributo obrigatório',
-            });
-        }
-
-        const result = await app.services.accounts.save(body);
-
-        if (result.error) {
-            return res.status(400).json(result);
-        }
-
-        return res.status(201).json(result[0]);
+        app.services.accounts.save(body)
+            .then(result => res.status(201).json(result[0]))
+            .catch(error => res.status(400).json({ error: error.message }));
     };
 
     const update = (req, res) => {
