@@ -1,39 +1,41 @@
 module.exports = (app) => {
-    const findAll = (req, res) => {
+    const findAll = (req, res, next) => {
         app.services.accounts.findAll()
-            .then(users => res.status(200).json(users));
+            .then(users => res.status(200).json(users))
+            .catch(error => next(error));
     };
 
-    const find = (req, res) => {
+    const find = (req, res, next) => {
         const { id } = req.params;
 
         app.services.accounts.find({ id })
-            .then((account) => {
-                return res.status(200).json(account);
-            });
+            .then(account => res.status(200).json(account))
+            .catch(error => next(error));
     };
 
-    const createAccount = async (req, res) => {
+    const createAccount = async (req, res, next) => {
         const { body } = req;
 
         app.services.accounts.save(body)
             .then(result => res.status(201).json(result[0]))
-            .catch(error => res.status(400).json({ error: error.message }));
+            .catch(error => next(error));
     };
 
-    const update = (req, res) => {
+    const update = (req, res, next) => {
         const { id } = req.params;
         const { body } = req;
 
         app.services.accounts.update(id, body)
-            .then(account => res.status(200).json(account[0]));
+            .then(account => res.status(200).json(account[0]))
+            .catch(error => next(error));
     };
 
-    const remove = (req, res) => {
+    const remove = (req, res, next) => {
         const { id } = req.params;
 
         app.services.accounts.delete(id)
-            .then(() => res.status(204).send());
+            .then(() => res.status(204).send())
+            .catch(error => next(error));
     };
 
     return {
