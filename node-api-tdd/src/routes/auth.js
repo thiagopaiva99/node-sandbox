@@ -1,5 +1,6 @@
 const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt-nodejs');
+const ValidationError = require('../errors/validationError');
 
 const secret = 'Secret!';
 
@@ -9,6 +10,10 @@ module.exports = (app) => {
             email: req.body.email,
         })
         .then((user) => {
+            if (!user) {
+                throw new ValidationError('Usuário ou senha inválidos');
+            }
+
             if (bcrypt.compareSync(req.body.password, user.password)) {
                 const payload = {
                     id: user.id,
@@ -19,6 +24,8 @@ module.exports = (app) => {
                 const token = jwt.encode(payload, secret);
 
                 res.status(200).json({ token });
+            } else {
+                throw new ValidationError('Usuário ou senha inválidos');
             }
         })
         .catch(error => next(error));
