@@ -1,7 +1,11 @@
 const request = require('supertest');
 const app = require('../../src/app');
 
-const email = `user_${Date.now()}@mail.com`;
+let email;
+
+beforeEach(() => {
+    email = `user_${Date.now()}@mail.com`;
+});
 
 test('should return all users', () => {
     return request(app).get('/users')
@@ -21,7 +25,26 @@ test('should insert a user with success', () => {
         .then((response) => {
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty('name', 'Thiago');
+            expect(response.body).not.toHaveProperty('password');
         });
+});
+
+test('should save the password crypted', async () => {
+    const response = await request(app).post('/users')
+        .send({
+            name: 'Thiago',
+            email,
+            password: '123456',
+        });
+
+    expect(response.status).toBe(201);
+
+    const { id } = response.body;
+
+    const userDB = await app.services.users.findOne({ id });
+
+    expect(userDB.password).not.toBeUndefined();
+    expect(userDB.password).not.toBe('123456');
 });
 
 test('should not insert a user without a name', () => {
@@ -61,15 +84,24 @@ test('should not insert a user without a password', (done) => {
         });
 });
 
-test('should not insert a user with an email that already exists', () => {
-    return request(app).post('/users')
-    .send({
+test('should not insert a user with an email that already exists', async () => {
+    const user = {
         name: 'Thiago',
-        email,
+        email: `thiago_${Date.now()}@gmail.com`,
         password: '123456',
-    })
-    .then((response) => {
-        expect(response.status).toBe(400);
-        expect(response.body.error).toBe('Já existe um usuário com esse email');
-    });
+    };
+
+    const insertResponse = await request(app).post('/users')
+        .send(user);
+
+    expect(insertResponse.status).toBe(201);
+    expect(insertResponse.body).toHaveProperty('name', 'Thiago');
+    expect(insertResponse.body).not.toHaveProperty('password');
+
+    return request(app).post('/users')
+        .send(user)
+        .then((response) => {
+            expect(response.status).toBe(400);
+            expect(response.body.error).toBe('Já existe um usuário com esse email');
+        });
 });
