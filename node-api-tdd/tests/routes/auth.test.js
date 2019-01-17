@@ -45,3 +45,10 @@ test('should not login user that dont exists', () => {
             expect(response.body).toHaveProperty('error', 'Usuário ou senha inválidos');
         });
 });
+
+test('should not access a protected route without token', () => {
+    return request(app).get('/users')
+        .then((response) => {
+            expect(response.status).toBe(401);
+        });
+});
