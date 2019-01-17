@@ -1,4 +1,6 @@
 const request = require('supertest');
+const jwt = require('jwt-simple');
+
 const app = require('../../src/app');
 
 const MAIN_ROUTE = '/accounts';
@@ -12,10 +14,13 @@ beforeAll(async () => {
     });
 
     user = { ...response[0] };
+
+    user.token = jwt.encode(user, 'Secret!');
 });
 
 test('should insert an account with success', () => {
     return request(app).post(MAIN_ROUTE)
+        .set('authorization', `bearer ${user.token}`)
         .send({
             name: '#acc 1',
             user_id: user.id,
@@ -29,7 +34,7 @@ test('should insert an account with success', () => {
 test('should return all accounts', () => {
     return app.db('accounts')
         .insert({ name: 'Acc list', user_id: user.id })
-        .then(() => request(app).get(MAIN_ROUTE))
+        .then(() => request(app).get(MAIN_ROUTE).set('authorization', `bearer ${user.token}`))
         .then((response) => {
             expect(response.status).toBe(200);
             expect(response.body.length).toBeGreaterThan(0);
@@ -39,7 +44,7 @@ test('should return all accounts', () => {
 test('should return an account by id', () => {
     return app.db('accounts')
         .insert({ name: 'Acc list', user_id: user.id }, ['id'])
-        .then(account => request(app).get(`${MAIN_ROUTE}/${account[0].id}`))
+        .then(account => request(app).get(`${MAIN_ROUTE}/${account[0].id}`).set('authorization', `bearer ${user.token}`))
         .then((response) => {
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('name', 'Acc list');
@@ -51,6 +56,7 @@ test('should update an account', () => {
     return app.db('accounts')
         .insert({ name: 'Acc to Update', user_id: user.id }, '*')
         .then(account => request(app).put(`${MAIN_ROUTE}/${account[0].id}`)
+                            .set('authorization', `bearer ${user.token}`)
                             .send({ name: 'Acc Updated' }))
         .then((accountUpdated) => {
             expect(accountUpdated.status).toBe(200);
@@ -61,7 +67,7 @@ test('should update an account', () => {
 test('should delete an account', () => {
     return app.db('accounts')
         .insert({ name: 'Acc to Delete', user_id: user.id }, '*')
-        .then(account => request(app).delete(`${MAIN_ROUTE}/${account[0].id}`))
+        .then(account => request(app).delete(`${MAIN_ROUTE}/${account[0].id}`).set('authorization', `bearer ${user.token}`))
         .then((response) => {
             expect(response.status).toBe(204);
         });
@@ -69,6 +75,7 @@ test('should delete an account', () => {
 
 test('should not create account if name is empty', () => {
     return request(app).post(MAIN_ROUTE)
+        .set('authorization', `bearer ${user.token}`)
         .send({
             user_id: user.id,
         })

@@ -23,7 +23,7 @@ module.exports = (app) => {
             .catch(error => done(error, false));
     });
 
-    passport.user(strategy);
+    passport.use(strategy);
 
     return {
         authenticate: () => passport.authenticate('jwt', { session: false }),

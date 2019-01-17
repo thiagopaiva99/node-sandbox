@@ -3,7 +3,7 @@ module.exports = (app) => {
         .post(app.routes.auth.signin);
 
     app.route('/auth/signup')
-        .post(app.routes.users.create);
+        .post(app.routes.users.createUser);
 
     app.route('/users')
         .all(app.config.passport.authenticate())
