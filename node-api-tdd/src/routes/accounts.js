@@ -1,3 +1,5 @@
+const express = require('express');
+
 module.exports = (app) => {
     const findAll = (req, res, next) => {
         app.services.accounts.findAll()
@@ -38,11 +40,13 @@ module.exports = (app) => {
             .catch(error => next(error));
     };
 
-    return {
-        findAll,
-        find,
-        createAccount,
-        update,
-        delete: remove,
-    };
+    const router = express.Router();
+
+    router.get('/', findAll);
+    router.get('/:id', find);
+    router.post('/', createAccount);
+    router.put('/:id', update);
+    router.delete('/:id', remove);
+
+    return router;
 };

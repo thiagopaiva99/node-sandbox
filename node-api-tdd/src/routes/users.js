@@ -1,3 +1,5 @@
+const express = require('express');
+
 module.exports = (app) => {
     const findAll = (req, res, next) => {
         app.services.users.findAll()
@@ -15,8 +17,10 @@ module.exports = (app) => {
         }
     };
 
-    return {
-        findAll,
-        createUser,
-    };
+    const router = express.Router();
+
+    router.get('/', findAll);
+    router.post('/', createUser);
+
+    return router;
 };

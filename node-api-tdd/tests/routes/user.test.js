@@ -6,6 +6,8 @@ const app = require('../../src/app');
 let email;
 let user;
 
+const MAIN_ROUTE = '/v1/users';
+
 beforeEach(() => {
     email = `user_${Date.now()}@mail.com`;
 });
@@ -23,7 +25,7 @@ beforeAll(async () => {
 });
 
 test('should return all users', () => {
-    return request(app).get('/users')
+    return request(app).get(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .then((response) => {
             expect(response.status).toBe(200);
@@ -32,7 +34,7 @@ test('should return all users', () => {
 });
 
 test('should insert a user with success', () => {
-    return request(app).post('/users')
+    return request(app).post(`${MAIN_ROUTE}`)
         .send({
             name: 'Thiago',
             email,
@@ -47,7 +49,7 @@ test('should insert a user with success', () => {
 });
 
 test('should save the password crypted', async () => {
-    const response = await request(app).post('/users')
+    const response = await request(app).post(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .send({
             name: 'Thiago',
@@ -66,7 +68,7 @@ test('should save the password crypted', async () => {
 });
 
 test('should not insert a user without a name', () => {
-    return request(app).post('/users')
+    return request(app).post(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .send({
             email,
@@ -79,7 +81,7 @@ test('should not insert a user without a name', () => {
 });
 
 test('should not insert a user without an email', async () => {
-    const result = await request(app).post('/users')
+    const result = await request(app).post(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .send({
             name: 'Thiago',
@@ -91,7 +93,7 @@ test('should not insert a user without an email', async () => {
 });
 
 test('should not insert a user without a password', (done) => {
-    request(app).post('/users')
+    request(app).post(`${MAIN_ROUTE}`)
     .set('authorization', `bearer ${user.token}`)
         .send({
             name: 'Thiago',
@@ -112,7 +114,7 @@ test('should not insert a user with an email that already exists', async () => {
         password: '123456',
     };
 
-    const insertResponse = await request(app).post('/users')
+    const insertResponse = await request(app).post(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .send(newUser);
 
@@ -120,7 +122,7 @@ test('should not insert a user with an email that already exists', async () => {
     expect(insertResponse.body).toHaveProperty('name', 'Thiago');
     expect(insertResponse.body).not.toHaveProperty('password');
 
-    return request(app).post('/users')
+    return request(app).post(`${MAIN_ROUTE}`)
         .set('authorization', `bearer ${user.token}`)
         .send(newUser)
         .then((response) => {

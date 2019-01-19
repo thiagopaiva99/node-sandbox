@@ -64,7 +64,7 @@ test('should not login user that dont exists', () => {
 });
 
 test('should not access a protected route without token', () => {
-    return request(app).get('/users')
+    return request(app).get('/v1/users')
         .then((response) => {
             expect(response.status).toBe(401);
         });
