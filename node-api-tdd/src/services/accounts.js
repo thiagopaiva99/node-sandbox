@@ -1,12 +1,12 @@
 const ValidationError = require('../errors/validationError');
 
 module.exports = (app) => {
-    const findAll = (filter = {}) => {
-        return app.db('accounts').where(filter).select();
+    const findAll = (userId) => {
+        return app.db('accounts').where({ user_id: userId }).select();
     };
 
     const find = (filter) => {
-        return findAll(filter).first();
+        return app.db('accounts').where(filter).first();
     };
 
     const save = async (account) => {

@@ -1,13 +1,13 @@
 const express = require('express');
 
 module.exports = (app) => {
-    const findAll = (req, res, next) => {
-        app.services.accounts.findAll()
+    const find = (req, res, next) => {
+        app.services.accounts.findAll(req.user.id)
             .then(users => res.status(200).json(users))
             .catch(error => next(error));
     };
 
-    const find = (req, res, next) => {
+    const findOne = (req, res, next) => {
         const { id } = req.params;
 
         app.services.accounts.find({ id })
@@ -18,7 +18,7 @@ module.exports = (app) => {
     const createAccount = async (req, res, next) => {
         const { body } = req;
 
-        app.services.accounts.save(body)
+        app.services.accounts.save({ ...body, user_id: req.user.id })
             .then(result => res.status(201).json(result[0]))
             .catch(error => next(error));
     };
@@ -42,8 +42,8 @@ module.exports = (app) => {
 
     const router = express.Router();
 
-    router.get('/', findAll);
-    router.get('/:id', find);
+    router.get('/', find);
+    router.get('/:id', findOne);
     router.post('/', createAccount);
     router.put('/:id', update);
     router.delete('/:id', remove);
