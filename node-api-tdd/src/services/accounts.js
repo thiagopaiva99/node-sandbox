@@ -14,6 +14,12 @@ module.exports = (app) => {
             throw new ValidationError('Nome é um atributo obrigatório');
         }
 
+        const hasAccount = await find({ name: account.name, user_id: account.user_id });
+
+        if (hasAccount) {
+            throw new ValidationError('Já existe uma conta com esse nome para esse usuário');
+        }
+
         return app.db('accounts').insert(account, '*');
     };
 

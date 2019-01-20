@@ -91,3 +91,16 @@ test('should not create account if name is empty', () => {
             expect(response.body).toHaveProperty('error', 'Nome é um atributo obrigatório');
         });
 });
+
+test('should not create an account with duplicated name for the same user', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc Duplicated', user_id: user.id })
+        .then(() => request(app)
+                    .post(MAIN_ROUTE)
+                    .set('authorization', `bearer ${user.token}`)
+                    .send({ name: 'Acc Duplicated' }))
+        .then((response) => {
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('error', 'Já existe uma conta com esse nome para esse usuário');
+        });
+});
