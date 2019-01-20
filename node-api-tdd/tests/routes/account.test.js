@@ -105,13 +105,37 @@ test('should not create an account with duplicated name for the same user', () =
         });
 });
 
-test('should not return an account of another user', () => {
+test('should not return another user account', () => {
     return app.db('accounts')
         .insert({ name: 'Acc User 2', user_id: user2.id }, ['id'])
         .then(account => request(app)
                     .get(`${MAIN_ROUTE}/${account[0].id}`)
+                    .set('authorization', `bearer ${user.token}`))
+        .then((response) => {
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+        });
+});
+
+test('should not update another user account', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc User 2', user_id: user2.id }, ['id'])
+        .then(account => request(app)
+                    .put(`${MAIN_ROUTE}/${account[0].id}`)
                     .set('authorization', `bearer ${user.token}`)
-                    .send({ name: 'Acc Duplicated' }))
+                    .send({ name: 'Acc Updated' }))
+        .then((response) => {
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+        });
+});
+
+test('should not remove another user account', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc User 2', user_id: user2.id }, ['id'])
+        .then(account => request(app)
+                    .delete(`${MAIN_ROUTE}/${account[0].id}`)
+                    .set('authorization', `bearer ${user.token}`))
         .then((response) => {
             expect(response.status).toBe(403);
             expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');

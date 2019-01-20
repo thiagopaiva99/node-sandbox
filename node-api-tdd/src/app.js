@@ -22,13 +22,11 @@ app.get('/', (req, res) => {
 app.use((error, req, res, next) => {
     const { name, message, stack } = error;
 
-    if (name === 'ValidationError') {
-        res.status(400).json({ error: message });
-    } else {
-        return res.status(500).json({ name, message, stack });
-    }
+    if (name === 'ValidationError') res.status(400).json({ error: message });
+    if (name === 'ContentForbiddenError') res.status(403).json({ error: message });
+    else res.status(500).json({ name, message, stack });
 
-    next(error);
+    return next(error);
 });
 
 module.exports = app;

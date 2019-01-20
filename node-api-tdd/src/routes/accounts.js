@@ -1,4 +1,5 @@
 const express = require('express');
+const ContentForbiddenError = require('../errors/contentForbiddenError');
 
 module.exports = (app) => {
     const find = (req, res, next) => {
@@ -11,13 +12,7 @@ module.exports = (app) => {
         const { id } = req.params;
 
         app.services.accounts.find({ id })
-            .then((account) => {
-                if (account.user_id !== req.user.id) {
-                    return res.status(403).json({ error: 'Este recurso não pertence ao usuário' });
-                }
-
-                return res.status(200).json(account);
-            })
+            .then(account => res.status(200).json(account))
             .catch(error => next(error));
     };
 
@@ -47,6 +42,18 @@ module.exports = (app) => {
     };
 
     const router = express.Router();
+
+    router.param('id', (req, res, next) => {
+        app.services.accounts.find({ id: req.params.id })
+            .then((account) => {
+                if (account.user_id !== req.user.id) {
+                    throw new ContentForbiddenError();
+                } else {
+                    next();
+                }
+            })
+            .catch(error => next(error));
+    });
 
     router.get('/', find);
     router.get('/:id', findOne);
