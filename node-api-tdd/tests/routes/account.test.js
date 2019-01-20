@@ -104,3 +104,16 @@ test('should not create an account with duplicated name for the same user', () =
             expect(response.body).toHaveProperty('error', 'Já existe uma conta com esse nome para esse usuário');
         });
 });
+
+test('should not return an account of another user', () => {
+    return app.db('accounts')
+        .insert({ name: 'Acc User 2', user_id: user2.id }, ['id'])
+        .then(account => request(app)
+                    .get(`${MAIN_ROUTE}/${account[0].id}`)
+                    .set('authorization', `bearer ${user.token}`)
+                    .send({ name: 'Acc Duplicated' }))
+        .then((response) => {
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+        });
+});
