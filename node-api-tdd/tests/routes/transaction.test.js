@@ -106,7 +106,7 @@ test('should insert a transaction with success', () => {
         });
 });
 
-test('should return a transaction by id', () => {
+test('should return a transaction by id', (done) => {
     const transaction = {
         description: 'T4',
         date: new Date(),
@@ -120,9 +120,11 @@ test('should return a transaction by id', () => {
         .then((response) => {
             request(app).get(`${MAIN_ROUTE}/${response[0].id}`)
                 .set('authorization', `bearer ${user1.token}`)
-                .then((transaction) => {
-                    expect(response.status).toBe(200);
-                    expect(transaction.body.description).toEqual('T4');
+                .then((transactionResponse) => {
+                    expect(transactionResponse.status).toBe(200);
+                    expect(transactionResponse.body.description).toEqual('T4');
+
+                    done();
                 });
         });
 });
