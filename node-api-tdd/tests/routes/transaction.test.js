@@ -128,3 +128,112 @@ test('should return a transaction by id', (done) => {
                 });
         });
 });
+
+test('should update a transaction', (done) => {
+    const transactionToSave = {
+        description: 'T5',
+        date: new Date(),
+        ammount: 350,
+        type: 'O',
+        acc_id: account1.id,
+    };
+
+    return app.db('transactions')
+        .insert(transactionToSave, ['id'])
+        .then((transaction) => {
+            request(app).put(`${MAIN_ROUTE}/${transaction[0].id}`)
+                .set('authorization', `bearer ${user1.token}`)
+                .send({ description: 'T5 Updated' })
+                .then((transactionResponse) => {
+                    expect(transactionResponse.status).toBe(200);
+                    expect(transactionResponse.body).toHaveProperty('description', 'T5 Updated');
+
+
+                    done();
+                });
+        });
+});
+
+test('should remove a transaction', () => {
+    const transactionToRemove = {
+        description: 'T7',
+        date: new Date(),
+        ammount: 350,
+        type: 'O',
+        acc_id: account1.id,
+    };
+
+    return app.db('transactions')
+        .insert(transactionToRemove, ['id'])
+        .then((transaction) => {
+            request(app).delete(`${MAIN_ROUTE}/${transaction[0].id}`)
+                .set('authorization', `bearer ${user1.token}`)
+                .then((response) => {
+                    expect(response.status).toBe(200);
+                });
+        });
+});
+
+test('should not get a transaction from another user', () => {
+    const transactionToRemove = {
+        description: 'T8',
+        date: new Date(),
+        ammount: 350,
+        type: 'O',
+        acc_id: account2.id,
+    };
+
+    return app.db('transactions')
+        .insert(transactionToRemove, ['id'])
+        .then((transaction) => {
+            request(app).get(`${MAIN_ROUTE}/${transaction[0].id}`)
+                .set('authorization', `bearer ${user1.token}`)
+                .then((response) => {
+                    expect(response.status).toBe(403);
+                    expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+                });
+        });
+});
+
+test('should not update a transaction from another user', () => {
+    const transactionToRemove = {
+        description: 'T9',
+        date: new Date(),
+        ammount: 350,
+        type: 'O',
+        acc_id: account2.id,
+    };
+
+    return app.db('transactions')
+        .insert(transactionToRemove, ['id'])
+        .then((transaction) => {
+            request(app).put(`${MAIN_ROUTE}/${transaction[0].id}`)
+                .set('authorization', `bearer ${user1.token}`)
+                .send({ description: 'T9 Updated' })
+                .then((response) => {
+                    expect(response.status).toBe(403);
+                    expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+                });
+        });
+});
+
+test('should not remove a transaction from another user', () => {
+    const transactionToRemove = {
+        description: 'T10',
+        date: new Date(),
+        ammount: 350,
+        type: 'O',
+        acc_id: account2.id,
+    };
+
+    return app.db('transactions')
+        .insert(transactionToRemove, ['id'])
+        .then((transaction) => {
+            request(app).delete(`${MAIN_ROUTE}/${transaction[0].id}`)
+                .set('authorization', `bearer ${user1.token}`)
+                .then((response) => {
+                    expect(response.status).toBe(403);
+                    expect(response.body).toHaveProperty('error', 'Este recurso não pertence ao usuário');
+                });
+        });
+});

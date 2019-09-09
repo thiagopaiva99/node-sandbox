@@ -19,9 +19,23 @@ module.exports = (app) => {
         return app.db('transactions').insert(transaction, '*');
     };
 
+    const update = async (id, transaction) => {
+        return app.db('transactions')
+            .where({ id })
+            .update(transaction, '*');
+    };
+
+    const remove = (id) => {
+        return app.db('transactions')
+            .where({ id })
+            .delete();
+    };
+
     return {
         find,
         save,
         findOne,
+        update,
+        remove,
     };
 };

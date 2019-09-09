@@ -1,4 +1,5 @@
 const express = require('express');
+const ContentForbiddenError = require('../errors/contentForbiddenError');
 
 module.exports = (app) => {
     const findAll = (req, res, next) => {
@@ -26,11 +27,47 @@ module.exports = (app) => {
             .catch(next);
     };
 
+    const update = (req, res, next) => {
+        const { id } = req.params;
+        const { body } = req;
+
+        app.services.transactions.update(id, body)
+            .then(transaction => res.status(200).json(transaction[0]))
+            .catch(next);
+    };
+
+    const remove = (req, res, next) => {
+        const { id } = req.params;
+
+        app.services.transactions.remove(id)
+            .then(() => res.status(200))
+            .catch(next);
+    };
+
+    const validateUserRelatedToTransaction = (req, res, next) => {
+        const { id } = req.user;
+        const filter = { 'transactions.id': req.params.id };
+
+        app.services.transactions.find(id, filter)
+            .then((transactions) => {
+                if (transactions.length > 0) {
+                    return next();
+                }
+
+                throw new ContentForbiddenError();
+            })
+            .catch(next);
+    };
+
     const router = express.Router();
+
+    router.param('id', validateUserRelatedToTransaction);
 
     router.get('/', findAll);
     router.post('/', save);
     router.get('/:id', findOne);
+    router.put('/:id', update);
+    router.delete('/:id', remove);
 
     return router;
 };
